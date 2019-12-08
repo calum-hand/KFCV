@@ -29,4 +29,9 @@ This helps simulate a situation where the model must make a prediction based on 
  
 ## Usage
 
+## TODO
+* Write tests
+* Automate tests
+* Demonstrate on standard classification and regression data sets
+* Set up continuous integration with Travis / Docker
  
