@@ -63,6 +63,23 @@ class ClusterFoldValidation(object):
         train, test = cv_assignments == cv_train, cv_assignments != cv_train
         return X[train], X[test], y[train], y[test]
 
+    @staticmethod
+    def _assess_model(X_train, X_test, y_train, y_test, estimator, metric):
+        """
+
+        :param X_train:
+        :param X_test:
+        :param y_train:
+        :param y_test:
+        :param estimator:
+        :param metric:
+        :return:
+        """
+        estimator.fit(X_train, y_train)
+        y_pred = estimator.predict(X_test)
+        score = metric(y_pred, y_test)
+        return score
+
     def cross_cluster_validate(self, cv, estimator, metric):
         """
         DocString
@@ -76,10 +93,8 @@ class ClusterFoldValidation(object):
         cv_assig, cv_labels = self._cluster_data(self.X_train, cv)
         for label in cv_labels:
             X_tr, X_cv, y_tr, y_cv = self._cross_val_tt_split(self.X_train, self.y_train, label, cv_assig, cv_labels)
-            estimator.fit(X_tr, y_tr)
-            y_pred_tr, y_pred_cv = estimator.predict(X_tr), estimator.predict(X_cv)
-            tr_score = metric(y_pred_tr, y_tr)
-            cv_score = metric(y_pred_cv, y_cv)
+            tr_score = self._assess_model(X_tr, X_tr, y_tr, y_tr, estimator, metric)
+            cv_score = self._assess_model(X_tr, X_cv, y_tr, y_cv, estimator, metric)
             cross_val_scores['train'].append(tr_score)
             cross_val_scores['cv'].append(cv_score)
         return cross_val_scores
@@ -92,7 +107,5 @@ class ClusterFoldValidation(object):
         :param metric: function,
         :return:
         """
-        estimator.fit(self.X_train, self.y_train)
-        y_pred = estimator.predict(self.X_test)
-        model_score = metric(y_pred, self.y_test)
+        model_score = self._assess_model(self.X_train, self.X_test, self.y_train, self.y_test, estimator, metric)
         return model_score
