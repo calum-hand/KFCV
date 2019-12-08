@@ -9,14 +9,12 @@ class ClusterFoldValidation(object):
     """
     DocString
     """
-    def __init__(self, X, y, test_size=0.2, model=KMeans):
+    def __init__(self, X, y, test_div=5, model=KMeans):
         self.X = X
         self.y = y
+        self.k_clusters = test_div
         self.model = model
-        self.k_clusters = int(1/test_size)
-        assert 0 < self.k_clusters < len(X), 'test size specified does not allow for suitable clustering'
         self.k_assignments, self.k_labels = self._cluster_data(self.X, self.k_clusters)
-
         self.X_train, self.X_test, self.y_train, self.y_test = (None, None, None, None)
 
     def _cluster_data(self, X, k):
