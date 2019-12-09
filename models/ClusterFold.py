@@ -1,4 +1,4 @@
-__version__ = '2.1.1'
+__version__ = '2.1.2'
 __author__ = 'Calum Hand'
 
 import numpy as np
@@ -108,7 +108,7 @@ class KlusterFoldCrossValidation(object):
         score = metric(y_pred, y_test)
         return score
 
-    def cross_cluster_validate(self, cv, estimator, metric):
+    def cross_cluster_validate(self, estimator, metric, cv=10):
         """
         Performs a cluster fold validation of the training data.
         The number of folds, `cv`, is taken as the number of clusters to segment the training data into.
@@ -116,9 +116,9 @@ class KlusterFoldCrossValidation(object):
         withheld cluster.
         The prediction score of the model against the training data and cross validation data is then returned.
 
-        :param cv: int,  The number of folds / clusters to segment the passed data into
         :param estimator: object, The ML estimator to be assessed, must have `.fit()` and `.predict()` methods
         :param metric: function, Assesses passed estimator, must only compare predicted and test target values directly
+        :param cv: int,  The number of folds / clusters to segment the passed data into
 
         :return: dict, Model train and cross validation scores stored as lists in key value pairs with score name
         """
