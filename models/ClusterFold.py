@@ -1,4 +1,4 @@
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __author__ = 'Calum Hand'
 
 import numpy as np
@@ -67,7 +67,7 @@ class ClusterFoldValidation(object):
         :return: (X_train, X_test, y_train, y_test), segmented train and test data feature matrices and target arrays
         """
         data_train = data_labels[data_labels != label]
-        train, test = data_assignments == data_train, data_assignments != data_train
+        train, test = np.isin(data_assignments, data_train), np.isin(data_assignments, data_train, invert=True)
         return X[train], X[test], y[train], y[test]
 
     def train_test_split(self, test_label=0):
