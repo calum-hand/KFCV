@@ -1,11 +1,11 @@
-__version__ = '1.1.1'
+__version__ = '2.1.1'
 __author__ = 'Calum Hand'
 
 import numpy as np
 from sklearn.cluster import KMeans
 
 
-class ClusterFoldValidation(object):
+class KlusterFoldCrossValidation(object):
     """
     Allows for higher harsher assessment of supervised learning methods by designating train and test sets through
     clustering of the original feature matrix.
