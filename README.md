@@ -30,7 +30,6 @@ This helps simulate a situation where the model must make a prediction based on 
 ## Usage
 
 ## TODO
-* Include classification test and metric also in the tests
 * Automate tests
 * Set up continuous integration with Travis / Docker
  
