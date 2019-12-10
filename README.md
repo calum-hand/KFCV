@@ -30,6 +30,5 @@ This helps simulate a situation where the model must make a prediction based on 
 ## Usage
 
 ## TODO
-* Automate tests
-* Set up continuous integration with Travis / Docker
+* Set up Docker build on Travis
  
