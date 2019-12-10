@@ -1,21 +1,29 @@
+import pytest
 import numpy as np
-from sklearn.linear_model import LinearRegression  # chosen as very simple model, therefore allows quick testing
-from sklearn.metrics import mean_absolute_error as mae  # arbitrary choice
+
+from sklearn.linear_model import LinearRegression  # regression model for testing
+from sklearn.tree import DecisionTreeClassifier  # classification model for testing
+from sklearn.metrics import mean_absolute_error as mae  # arbitrary regression metric
+from sklearn.metrics import accuracy_score  # arbitrary classification metric
 
 from models.ClusterFold import KlusterFoldCrossValidation
 
 
-def test_kfcv_initialisation():
+@pytest.mark.parametrize("n, k",
+                         [(100, 5),
+                          (200, 2)])
+def test_kfcv_initialisation(n, k):
     """
     Test behaviour of kfcv at initialisation:
     * Internal attributes updated correctly
     * Cluster assignments are int
     * Get as many output labels as expected
+
+    :param n, int, number of entries in array
+    :param k, int, number of clusters to generate
     """
-    n = 100
     X, y = np.random.randn(n, 2), np.ones(n)
     y[X[:, 0] + X[:, 1] < 0] = 0
-    k = 5
     kfcv = KlusterFoldCrossValidation(X, y, test_div=k)
 
     assert X.shape == kfcv.X.shape  # check no change when initialising object
@@ -26,17 +34,21 @@ def test_kfcv_initialisation():
     assert len(kfcv.k_labels) == k  # check clustering produced anticipated number of clusters
 
 
-def test_kfcv_train_test_split():
+@pytest.mark.parametrize("n, k",
+                         [(100, 5),
+                          (200, 2)])
+def test_kfcv_train_test_split(n, k):
     """
     Test the output of kfcv `train_test_split` method:
     * Feature matrices are 2D and target arrays 1D
     * Train and test sets have equal number of data points
     * The number of data points in train and test equals that of the original data
+
+    :param n, int, number of entries in array
+    :param k, int, number of clusters to generate
     """
-    n = 100
     X, y = np.random.randn(n, 2), np.ones(n)
     y[X[:, 0] + X[:, 1] < 0] = 0
-    k = 5
     kfcv = KlusterFoldCrossValidation(X, y, test_div=k)
     X_train, X_test, y_train, y_test = kfcv.train_test_split()
 
@@ -48,22 +60,29 @@ def test_kfcv_train_test_split():
     assert X_train.shape[1] == X_test.shape[1] == X.shape[1]  # check number of features is preserved
 
 
-def test_kfcv_cross_cluster_validate():
+@pytest.mark.parametrize("n, k, cv_count, estimator, metric",
+                         [(100, 5, 10, LinearRegression(), mae),
+                          (200, 2, 10, LinearRegression(), mae),
+                          (100, 5, 10, DecisionTreeClassifier(), accuracy_score),
+                          (200, 2, 10, DecisionTreeClassifier(), accuracy_score)])
+def test_kfcv_cross_cluster_validate(n, k, cv_count, estimator, metric):
     """
     Test the output of the kfcv's `cross_cluster_validate` method:
     * 2 dictionary entries returned
     * Dictionary keys are as expected
     * Number of entries in output lists equal the number of cross validations performed
+
+    :param n: int, number of entries in array
+    :param k: int, number of clusters to generate
+    :param cv_count: int, number of clusters for the cross validation
+    :param estimator: machine learning model with `fit` and `predict` methods
+    :param metric: score used to quantify the prediction of the estimator
     """
-    n = 100
     X, y = np.random.randn(n, 2), np.ones(n)
     y[X[:, 0] + X[:, 1] < 0] = 0
-    k = 5
     kfcv = KlusterFoldCrossValidation(X, y, test_div=k)
     kfcv.train_test_split()
-    lr = LinearRegression()
-    cv_count = 5
-    cv_results = kfcv.cross_cluster_validate(estimator=lr, metric=mae, cv=cv_count)
+    cv_results = kfcv.cross_cluster_validate(estimator=estimator, metric=metric, cv=cv_count)
 
     assert len(cv_results) == 2  # only two entries in returned dictionary
     assert 'train' in cv_results and 'cv' in cv_results  # keys are as expected
@@ -71,26 +90,33 @@ def test_kfcv_cross_cluster_validate():
     assert len(train) == len(cv) == cv_count  # get as many values out as we expected to
 
 
-def test_kfcv_estimator_test():
+@pytest.mark.parametrize("n, k, cv_count, estimator, metric",
+                         [(100, 5, 10, LinearRegression(), mae),
+                          (200, 2, 10, LinearRegression(), mae),
+                          (100, 5, 10, DecisionTreeClassifier(), accuracy_score),
+                          (200, 2, 10, DecisionTreeClassifier(), accuracy_score)])
+def test_kfcv_estimator_test(n, k, cv_count, estimator, metric):
     """
     Test output of the kfcv `estimator_test` method:
     * Have the internal feature (train/test) and target (train/test) changed since `train_test_split` method was called
     * Output value is a float
+
+    :param n: int, number of entries in array
+    :param k: int, number of clusters to generate
+    :param cv_count: int, number of clusters for the cross validation
+    :param estimator: machine learning model with `fit` and `predict` methods
+    :param metric: score used to quantify the prediction of the estimator
     """
-    n = 100
     X, y = np.random.randn(n, 2), np.ones(n)
     y[X[:, 0] + X[:, 1] < 0] = 0
-    k = 5
     kfcv = KlusterFoldCrossValidation(X, y, test_div=k)
     X_train, X_test, y_train, y_test = kfcv.train_test_split()
-    lr = LinearRegression()
-    cv_count = 5
-    kfcv.cross_cluster_validate(estimator=lr, metric=mae, cv=cv_count)
+    kfcv.cross_cluster_validate(estimator=estimator, metric=metric, cv=cv_count)
 
     assert kfcv.X_train.all() == X_train.all()  # check that the internal attributes do not undergo change after split
     assert kfcv.X_test.all() == X_test.all()
     assert kfcv.y_train.all() == y_train.all()
     assert kfcv.y_test.all() == y_test.all()
 
-    model_out = kfcv.estimator_test(estimator=lr, metric=mae)
+    model_out = kfcv.estimator_test(estimator=estimator, metric=metric)
     assert model_out.dtype == float  # ensure output is float
