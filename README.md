@@ -28,6 +28,8 @@ This helps simulate a situation where the model must make a prediction based on 
 ![](media/cross_validation.png)
  
 ## Usage
+An example of the `kfcv` class can be found in the [demo jupyter notebook](notebooks/kfcv_demonstration.ipynb).
+A simple 2D feature space is used here to demonstrate the clustering suitably as higher dimensions become harder to visualise.
 
 ## TODO
 * Set up Docker build on Travis
