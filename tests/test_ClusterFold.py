@@ -31,7 +31,7 @@ def test_kfcv_initialisation(n, m, k):
     assert len(kfcv.X) == len(kfcv.y) == len(kfcv.k_assignments)  # check assignment generated for each data point
     assert kfcv.X_train == kfcv.X_test == kfcv.y_train == kfcv.y_test is None  # check not yet initialised
     assert kfcv.k_assignments.dtype == kfcv.k_labels.dtype
-    #assert kfcv.k_labels.dtype in ['int8', 'int16', 'int32', 'int64']
+    assert kfcv.k_labels.dtype in ['int8', 'int16', 'int32', 'int64']
     assert len(kfcv.k_labels) == k  # check clustering produced anticipated number of clusters
 
 
