@@ -1,4 +1,4 @@
-__version__ = '2.1.2'
+__version__ = '2.1.3'
 __author__ = 'Calum Hand'
 
 import numpy as np
@@ -132,7 +132,7 @@ class KlusterFoldCrossValidation(object):
             cross_val_scores['cv'].append(cv_score)
         return cross_val_scores
 
-    def estimator_test(self, estimator, metric):
+    def estimator_eval(self, estimator, metric):
         """
         Allows for the passed estimator to be trained on the full training data set and then tested against the test set
         originally segmented by the clustering process.

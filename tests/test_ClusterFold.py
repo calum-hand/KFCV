@@ -96,7 +96,7 @@ def test_kfcv_cross_cluster_validate(n, m, k, cv_count, estimator, metric):
                           (200, 5, 2, 10, LinearRegression(), mae),
                           (100, 2, 5, 10, DecisionTreeClassifier(), accuracy_score),
                           (200, 5, 2, 10, DecisionTreeClassifier(), accuracy_score)])
-def test_kfcv_estimator_test(n, m, k, cv_count, estimator, metric):
+def test_kfcv_estimator_eval(n, m, k, cv_count, estimator, metric):
     """
     Test output of the kfcv `estimator_test` method:
     * Have the internal feature (train/test) and target (train/test) changed since `train_test_split` method was called
@@ -119,5 +119,5 @@ def test_kfcv_estimator_test(n, m, k, cv_count, estimator, metric):
     assert kfcv.y_train.all() == y_train.all()
     assert kfcv.y_test.all() == y_test.all()
 
-    model_out = kfcv.estimator_test(estimator=estimator, metric=metric)
+    model_out = kfcv.estimator_eval(estimator=estimator, metric=metric)
     assert model_out.dtype == float  # ensure output is float
